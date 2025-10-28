@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobalPort System - Controle de Acesso</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Cabeçalho Corporativo -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <div class="logo-icon">🏭</div>
+                    <span>GlobalPort System</span>
+                </div>
+                <ul class="nav-links">
+                    <li>
+                        <a href="#" onclick="showPage('dashboard')" class="nav-link active">
+                            <span class="icon">📊</span> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showPage('registro')" class="nav-link">
+                            <span class="icon">🚪</span> Controle de Acesso
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showPage('manobras')" class="nav-link">
+                            <span class="icon">🚛</span> Gestão de Manobras
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        <!-- Página Dashboard -->
+        <div id="dashboard-page" class="page active">
+            <div class="card" style="margin-bottom: 2rem;">
+                <h1>Dashboard - Controle de Acesso</h1>
+                <p style="color: var(--text-light); margin-top: 0.5rem;">Visão geral das operações em tempo real</p>
+            </div>
+            
+            <!-- Informações dos Turnos -->
+            <div class="turno-info">
+                <div class="turno-card" id="turno-a">
+                    <h3>Turno A</h3>
+                    <p>07:00 - 15:00</p>
+                    <div class="turno-status"></div>
+                </div>
+                <div class="turno-card" id="turno-b">
+                    <h3>Turno B</h3>
+                    <p>15:00 - 23:40</p>
+                    <div class="turno-status"></div>
+                </div>
+                <div class="turno-card" id="turno-c">
+                    <h3>Turno C</h3>
+                    <p>23:40 - 07:00</p>
+                    <div class="turno-status"></div>
+                </div>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="stats-grid">
+                <div class="card">
+                    <h3>📈 Métricas do Dia</h3>
+                    <div class="stat-item">
+                        <strong>Entradas Registradas:</strong>
+                        <span id="total-entradas">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Total de Pessoas:</strong>
+                        <span id="total-pessoas">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Ônibus em Pátio:</strong>
+                        <span id="onibus-ativos">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Operações Agendadas:</strong>
+                        <span id="manobras-hoje">0</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>⚡ Centro de Controle</h3>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button class="btn btn-primary" onclick="showPage('registro')">
+                            <span class="icon">📝</span> Novo Registro
+                        </button>
+                        <button class="btn btn-secondary" onclick="showPage('manobras')">
+                            <span class="icon">🗓️</span> Agendar Operação
+                        </button>
+                        <button class="btn btn-secondary" onclick="gerarRelatorio()">
+                            <span class="icon">📊</span> Relatório Executivo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimos Registros -->
+            <div class="card">
+                <h3>🕒 Últimas Movimentações</h3>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Horário</th>
+                                <th>Veículo</th>
+                                <th>Placa</th>
+                                <th>Pessoas</th>
+                                <th>Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ultimos-registros">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-light);">
+                                    Nenhum registro hoje
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página Registro de Acesso -->
+        <div id="registro-page" class="page">
+            <div class="card" style="margin-bottom: 2rem;">
+                <h1>🚪 Controle de Acesso</h1>
+                <p style="color: var(--text-light); margin-top: 0.5rem;">Registro de entrada e saída de veículos e pessoas</p>
+            </div>
+            
+            <form id="form-registro" class="card">
+                <h3>📋 Novo Registro</h3>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="tipo_entrada">Tipo de Movimentação:</label>
+                        <select id="tipo_entrada" name="tipo_entrada" required>
+                            <option value="entrada">🟢 Entrada</option>
+                            <option value="saida">🔴 Saída</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipo_veiculo">Tipo de Veículo:</label>
+                        <select id="tipo_veiculo" name="tipo_veiculo" required>
+                            <option value="carro">🚗 Carro</option>
+                            <option value="onibus">🚌 Ônibus</option>
+                            <option value="caminhao">🚚 Caminhão</option>
+                            <option value="moto">🏍️ Moto</option>
+                            <option value="van">🚐 Van</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="placa_veiculo">Placa do Veículo:</label>
+                        <input type="text" id="placa_veiculo" name="placa_veiculo" placeholder="ABC-1D23" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantidade_pessoas">Quantidade de Pessoas:</label>
+                        <input type="number" id="quantidade_pessoas" name="quantidade_pessoas" value="1" min="1" max="100" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nome">Nome do Responsável:</label>
+                        <input type="text" id="nome" name="nome" placeholder="Nome completo">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cpf">CPF do Responsável:</label>
+                        <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="empresa">Empresa/Contratante:</label>
+                        <input type="text" id="empresa" name="empresa" placeholder="Nome da empresa ou organização">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="observacoes">Observações:</label>
+                        <textarea id="observacoes" name="observacoes" rows="3" placeholder="Motivo da visita, destino, observações importantes..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="icon">💾</span> Salvar Registro
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="showPage('dashboard')">
+                        <span class="icon">↩️</span> Voltar ao Dashboard
+                    </button>
+                </div>
+            </form>
+
+            <!-- Registros Recentes -->
+            <div class="card">
+                <h3>📝 Registros Recentes</h3>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Veículo</th>
+                                <th>Placa</th>
+                                <th>Pessoas</th>
+                                <th>Tipo</th>
+                                <th>Responsável</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registros-recentes">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-light);">
+                                    Nenhum registro encontrado
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página Manobras -->
+        <div id="manobras-page" class="page">
+            <div class="card" style="margin-bottom: 2rem;">
+                <h1>🚛 Gestão de Manobras</h1>
+                <p style="color: var(--text-light); margin-top: 0.5rem;">Agendamento e controle de operações de manobra</p>
+            </div>
+            
+            <div class="manobras-grid">
+                <div class="card">
+                    <h3>📅 Nova Operação</h3>
+                    <form id="form-manobra">
+                        <div class="form-group">
+                            <label for="manobra-placa">Placa do Veículo:</label>
+                            <input type="text" id="manobra-placa" name="placa_veiculo" placeholder="ABC-1D23" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="manobra-motorista">Motorista/Operador:</label>
+                            <input type="text" id="manobra-motorista" name="motorista" placeholder="Nome completo do motorista" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="manobra-local">Local da Operação:</label>
+                            <select id="manobra-local" name="local_manobra" required>
+                                <option value="">Selecione o local...</option>
+                                <option value="Pátio de Máquinas">Pátio de Máquinas</option>
+                                <option value="Área de Carga">Área de Carga</option>
+                                <option value="Zona de Descarga">Zona de Descarga</option>
+                                <option value="Pátio Principal">Pátio Principal</option>
+                                <option value="Área de Manutenção">Área de Manutenção</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="manobra-horario">Horário Previsto:</label>
+                            <input type="datetime-local" id="manobra-horario" name="horario_previsto" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="manobra-observacoes">Instruções/Observações:</label>
+                            <textarea id="manobra-observacoes" name="observacoes" rows="3" placeholder="Instruções especiais, equipamentos necessários..."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="icon">✅</span> Agendar Operação
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="showPage('dashboard')">
+                                <span class="icon">↩️</span> Voltar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>📋 Operações Agendadas</h3>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Placa</th>
+                                    <th>Motorista</th>
+                                    <th>Local</th>
+                                    <th>Horário</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-manobras">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-light);">
+                                        Nenhuma operação agendada
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/registro.js"></script>
+    <script src="js/manobras.js"></script>
+    <script src="js/animations.js"></script>
+</body>
+</html>
