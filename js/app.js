@@ -3,7 +3,8 @@ let registros = JSON.parse(localStorage.getItem('registros_portaria')) || [];
 let manobras = JSON.parse(localStorage.getItem('manobras_portaria')) || [];
 let agendamentos = JSON.parse(localStorage.getItem('agendamentos_portaria')) || [];
 let frota = JSON.parse(localStorage.getItem('frota_portaria')) || [];
-let setores = JSON.parse(localStorage.getItem('setores_portaria')) || [];
+// (LINHA ALTERADA) Adicionamos setores padrão, incluindo Estacionamento
+let setores = JSON.parse(localStorage.getItem('setores_portaria')) || [ { "id": 1, "nome": "Administrativo" }, { "id": 2, "nome": "Indústria" }, { "id": 3, "nome": "Agrícola" }, { "id": 4, "nome": "Manutenção" }, { "id": 5, "nome": "Estacionamento" } ];
 let empresas = JSON.parse(localStorage.getItem('empresas_portaria')) || [];
 
 // Controle de navegação entre páginas
@@ -37,6 +38,13 @@ function showPage(pageId, event) {
     if (pageId === 'dashboard') {
         atualizarDashboard();
         atualizarTurno();
+    } else if (pageId === 'monitor') { // (NOVO)
+        // A função initMap() deve ser chamada por monitor.js
+        // Apenas garantimos que a atualização seja chamada
+        if (typeof initMap === 'function') {
+            initMap(); // Inicializa o mapa (só roda uma vez, se necessário)
+            atualizarMonitor(); // Atualiza os marcadores
+        }
     } else if (pageId === 'manobras') {
         carregarManobras();
     } else if (pageId === 'registro') {
@@ -134,14 +142,28 @@ function showNotification(message, type = 'success') {
 
 // Animação de saída para notificação
 // Adicione ao seu style.css se não existir, ou defina aqui
-if (!document.styleSheets[0].cssRules.length) {
-    document.styleSheets[0].insertRule(`
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
+if (document.styleSheets.length > 0 && document.styleSheets[0].cssRules) {
+    let hasSlideOut = false;
+    for (let rule of document.styleSheets[0].cssRules) {
+        if (rule && rule.name === 'slideOut') {
+            hasSlideOut = true;
+            break;
         }
-    `, 0);
+    }
+    if (!hasSlideOut) {
+        try {
+            document.styleSheets[0].insertRule(`
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `, 0);
+        } catch (e) {
+            console.warn("Não foi possível inserir a regra CSS @keyframes slideOut:", e);
+        }
+    }
 }
+
 
 // ==========================
 // FUNÇÕES GLOBAIS DE UTILIDADE

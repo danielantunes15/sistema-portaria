@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlobalPort System - Controle de Acesso</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/pages.css">
 </head>
@@ -22,13 +30,18 @@
                         </a>
                     </li>
                     <li>
+                        <a href="#" onclick="showPage('monitor', event)" class="nav-link">
+                            <span class="icon">🛰️</span> Monitoramento
+                        </a>
+                    </li>
+                    <li>
                         <a href="#" onclick="showPage('registro', event)" class="nav-link">
                             <span class="icon">🚪</span> Controle de Acesso
                         </a>
                     </li>
                     <li>
                         <a href="#" onclick="showPage('manobras', event)" class="nav-link">
-                            <span class="icon">🚛</span> Gestão de Manobras
+                            <span class="icon">🚛</span> Manobras
                         </a>
                     </li>
                     <li>
@@ -140,6 +153,23 @@
             </div>
         </div>
 
+        <div id="monitor-page" class="page">
+            <div class="monitor-layout">
+                <div class="map-wrapper card">
+                    <div id="map-container"></div>
+                </div>
+                
+                <div class="live-feed-sidebar card">
+                    <h3><span class="icon">🔴</span> Acessos Ativos</h3>
+                    <p style="color: var(--text-light); margin-top: -1.5rem; margin-bottom: 1rem; font-size: 0.9rem;">
+                        Veículos atualmente dentro da usina.
+                    </p>
+                    <div id="live-feed-list">
+                        </div>
+                </div>
+            </div>
+        </div>
+
         <div id="registro-page" class="page">
             <div class="card" style="margin-bottom: 2rem;">
                 <h1>🚪 Controle de Acesso</h1>
@@ -235,7 +265,7 @@
         </div>
 
         <div id="manobras-page" class="page">
-             <div class="card" style="margin-bottom: 2rem;">
+            <div class="card" style="margin-bottom: 2rem;">
                 <h1>🚛 Gestão de Manobras</h1>
                 <p style="color: var(--text-light); margin-top: 0.5rem;">Agendamento e controle de operações de manobra</p>
             </div>
@@ -308,7 +338,7 @@
         </div>
 
         <div id="agendamentos-page" class="page">
-             <div class="card" style="margin-bottom: 2rem;">
+            <div class="card" style="margin-bottom: 2rem;">
                 <h1>🗓️ Agendamentos</h1>
                 <p style="color: var(--text-light); margin-top: 0.5rem;">Pré-cadastro de visitantes e prestadores de serviço</p>
             </div>
@@ -371,7 +401,7 @@
         </div>
 
         <div id="consultas-page" class="page">
-             <div class="card" style="margin-bottom: 2rem;">
+            <div class="card" style="margin-bottom: 2rem;">
                 <h1>🔍 Consultas e Relatórios</h1>
                 <p style="color: var(--text-light); margin-top: 0.5rem;">Filtre e exporte o histórico de movimentações</p>
             </div>
@@ -595,5 +625,6 @@
     <script src="js/animations.js"></script>
     <script src="js/agendamentos.js"></script>
     <script src="js/consultas.js"></script>
-    <script src="js/admin.js"></script> </body>
+    <script src="js/admin.js"></script>
+    <script src="js/monitor.js"></script> </body>
 </html>

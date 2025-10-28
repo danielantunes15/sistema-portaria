@@ -1,28 +1,39 @@
 /* =================================
    ARQUIVO PRINCIPAL: GLOBAIS E COMPONENTES
+   TEMA: AZUL ESCURO (DARK MODE)
    ================================= */
 
-/* Reset e Variáveis CSS */
+/* Reset e Variáveis CSS (Paleta Dark/Azul) */
 :root {
-    --primary: #2c5530;
-    --primary-dark: #1e3a23;
-    --primary-light: #4a7c59;
-    --secondary: #344955;
-    --accent: #f9a826;
-    --text-dark: #2d3748;
-    --text-light: #718096;
-    --background: #f7fafc;
-    --white: #ffffff;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
+    --primary: #3b82f6; /* Azul 500 */
+    --primary-dark: #1d4ed8; /* Azul 700 */
+    --primary-light: #60a5fa; /* Azul 400 */
+    --secondary: #0f172a; /* Slate 900 (Header BG) */
+    --accent: #f9a826; /* Âmbar (Botões de Destaque) */
+    
+    --text-dark: #f1f5f9; /* Slate 100 (Texto Principal) */
+    --text-light: #94a3b8; /* Slate 400 (Texto Secundário) */
+    
+    --background: #0f172a; /* Slate 900 (BG Principal) */
+    --card-bg: #1e293b; /* Slate 800 (BG dos Cards) */
+    --white: #ffffff; /* Branco puro (para texto de botões) */
+
+    /* Tons de Cinza/Azul para bordas, hovers, etc. */
+    --gray-50: #334155; /* Slate 700 (Hover) */
+    --gray-100: #475569; /* Slate 600 (Bordas) */
+    --gray-200: #334155; /* Slate 700 (Bordas de Input) */
+    --gray-300: #475569; /* Slate 600 (Bordas de Input Focus) */
+
+    /* Cores de Status (Mantidas, têm bom contraste no escuro) */
     --success: #10b981;
     --warning: #f59e0b;
     --error: #ef4444;
+
+    /* Sombras são menos visíveis, bordas são mais importantes */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    
     --radius: 8px;
     --radius-lg: 12px;
 }
@@ -35,8 +46,10 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    color: var(--text-dark);
+    /* Gradiente de fundo escuro */
+    background: var(--background);
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--background) 100%);
+    color: var(--text-dark); /* Texto principal agora é claro */
     line-height: 1.6;
     min-height: 100vh;
 }
@@ -52,14 +65,14 @@ body {
 
 /* Header Corporativo */
 .header {
-    background: linear-gradient(135deg, var(--secondary) 0%, var(--primary-dark) 100%);
+    background: var(--secondary); /* Cor sólida escura para o header */
     color: var(--white);
     padding: 0;
     box-shadow: var(--shadow-lg);
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 4px solid var(--accent);
+    border-bottom: 4px solid var(--primary); /* Borda azul primária */
 }
 
 .nav {
@@ -75,10 +88,12 @@ body {
     gap: 12px;
     font-size: 1.5rem;
     font-weight: 700;
+    color: var(--white);
 }
 
 .logo-icon {
-    background: var(--accent);
+    background: var(--primary); /* Ícone com a cor primária */
+    color: var(--white);
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -92,14 +107,13 @@ body {
     display: flex;
     list-style: none;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05); /* Fundo sutil para links */
     padding: 8px;
     border-radius: var(--radius);
-    backdrop-filter: blur(10px);
 }
 
 .nav-link {
-    color: var(--white);
+    color: var(--text-dark);
     text-decoration: none;
     padding: 12px 24px;
     border-radius: var(--radius);
@@ -111,13 +125,15 @@ body {
 }
 
 .nav-link:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
     transform: translateY(-1px);
 }
 
 .nav-link.active {
-    background: var(--accent);
-    color: var(--primary-dark);
+    background: var(--accent); /* Destaque com o Amarelo */
+    color: #1e293b; /* Texto escuro para o acento */
+    font-weight: 700;
     box-shadow: var(--shadow);
 }
 
@@ -143,12 +159,12 @@ body {
 
 /* Cards Modernos */
 .card {
-    background: var(--white);
+    background: var(--card-bg); /* Fundo do card escuro */
     border-radius: var(--radius-lg);
     padding: 2rem;
     margin-bottom: 1.5rem;
     box-shadow: var(--shadow);
-    border: 1px solid var(--gray-200);
+    border: 1px solid var(--gray-100); /* Borda sutil */
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -161,16 +177,18 @@ body {
     left: 0;
     width: 4px;
     height: 100%;
+    /* Gradiente com as novas cores primária e acento */
     background: linear-gradient(to bottom, var(--primary), var(--accent));
 }
 
 .card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
 }
 
 .card h3 {
-    color: var(--secondary);
+    color: var(--text-dark); /* Títulos claros */
     margin-bottom: 1.5rem;
     font-size: 1.25rem;
     font-weight: 600;
@@ -185,12 +203,12 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 0;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--gray-50); /* Borda mais escura */
     transition: background-color 0.3s ease;
 }
 
 .stat-item:hover {
-    background: var(--gray-50);
+    background: rgba(255, 255, 255, 0.03); /* Hover muito sutil */
     margin: 0 -1rem;
     padding: 1rem;
     border-radius: var(--radius);
@@ -201,13 +219,13 @@ body {
 }
 
 .stat-item strong {
-    color: var(--text-dark);
+    color: var(--text-light); /* Texto de label mais sutil */
     font-weight: 500;
 }
 
 .stat-item span {
     font-weight: 700;
-    color: var(--primary);
+    color: var(--primary-light); /* Valor com cor de destaque */
     font-size: 1.1rem;
 }
 
@@ -230,7 +248,7 @@ body {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: var(--secondary);
+    color: var(--text-light); /* Label sutil */
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -241,11 +259,12 @@ body {
 .form-group textarea {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid var(--gray-200);
+    border: 2px solid var(--gray-200); /* Borda do input */
     border-radius: var(--radius);
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: var(--white);
+    background: var(--gray-50); /* Fundo do input */
+    color: var(--text-dark); /* Texto do input */
     font-family: inherit;
 }
 
@@ -253,17 +272,19 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+    border-color: var(--primary); /* Foco com cor primária */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* Sombra de foco azul */
     transform: translateY(-1px);
+    background: var(--card-bg);
 }
 
-/* Estilo para campos desabilitados ou preenchidos */
+/* Estilo para campos desabilitados */
 .form-group input:disabled,
 .form-group select:disabled {
-    background-color: var(--gray-100);
+    background-color: var(--secondary);
     color: var(--text-light);
     cursor: not-allowed;
+    opacity: 0.7;
 }
 
 .form-actions {
@@ -271,7 +292,7 @@ body {
     gap: 1rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid var(--gray-200);
+    border-top: 1px solid var(--gray-100); /* Borda sutil */
 }
 
 /* Botões Corporativos */
@@ -292,25 +313,29 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    color: var(--white);
+    /* Botão primário agora é o Âmbar/Acento */
+    background: linear-gradient(135deg, var(--accent) 0%, var(--warning) 100%);
+    color: #1e293b; /* Texto escuro */
     box-shadow: var(--shadow);
+    font-weight: 700;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
+    opacity: 0.9;
 }
 
 .btn-secondary {
-    background: var(--white);
-    color: var(--secondary);
-    border: 2px solid var(--gray-300);
+    background: none; /* Fundo transparente */
+    color: var(--text-light); /* Texto sutil */
+    border: 2px solid var(--gray-300); /* Borda sutil */
 }
 
 .btn-secondary:hover {
-    border-color: var(--primary);
-    color: var(--primary);
+    border-color: var(--primary); /* Borda azul no hover */
+    color: var(--primary); /* Texto azul no hover */
+    background: rgba(59, 130, 246, 0.1);
     transform: translateY(-2px);
 }
 
@@ -320,18 +345,18 @@ body {
     overflow-y: auto;
     margin-top: 1rem;
     border-radius: var(--radius);
-    border: 1px solid var(--gray-200);
-    background: var(--white);
+    border: 1px solid var(--gray-100);
+    background: var(--card-bg);
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--white);
+    background: var(--card-bg);
 }
 
 .table th {
-    background: linear-gradient(135deg, var(--secondary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--background) 100%);
     color: var(--white);
     padding: 1rem;
     text-align: left;
@@ -341,11 +366,12 @@ body {
     letter-spacing: 0.5px;
     position: sticky;
     top: 0;
+    border-bottom: 2px solid var(--primary);
 }
 
 .table td {
     padding: 1rem;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--gray-50);
     color: var(--text-dark);
 }
 
@@ -366,30 +392,27 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-
+/* Os estilos de status existentes (cores claras) têm ótimo contraste no dark mode */
 .status-agendado {
     background: #fef3c7;
     color: #d97706;
 }
-
 .status-andamento {
     background: #dbeafe;
     color: #1d4ed8;
 }
-
 .status-concluido {
     background: #d1fae5;
     color: #065f46;
 }
-
 .status-dentro {
     background: #dbeafe;
     color: #1d4ed8;
 }
-
 .status-fora {
-    background: #f3f4f6;
-    color: #4b5563;
+    /* Única cor que ajustamos para o dark mode */
+    background: var(--gray-50);
+    color: var(--text-light);
 }
 
 
@@ -462,8 +485,8 @@ body {
     display: inline-block;
     width: 20px;
     height: 20px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid var(--primary);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top: 3px solid var(--white);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -485,11 +508,12 @@ body {
     box-shadow: var(--shadow-lg);
     z-index: 1001;
     animation: slideIn 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
+/* Cores de notificação mantidas, são fortes e funcionam bem */
 .notification.success { background: var(--success); }
 .notification.error { background: var(--error); }
-.notification.warning { background: var(--warning); }
+.notification.warning { background: var(--warning); color: #1e293b; }
 
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
