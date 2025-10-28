@@ -14,7 +14,8 @@ document.getElementById('form-manobra').addEventListener('submit', function(e) {
         horario_timestamp: horarioPrevisto.getTime(),
         observacoes: formData.get('observacoes'),
         status: 'agendado',
-        data_criacao: new Date().toLocaleString('pt-BR')
+        data_criacao: new Date().toLocaleString('pt-BR'),
+        data_criacao_timestamp: new Date().getTime() // Adicionado para dashboard
     };
     
     // Adiciona às manobras
@@ -22,7 +23,7 @@ document.getElementById('form-manobra').addEventListener('submit', function(e) {
     salvarDados();
     
     // Feedback e reset
-    alert('✅ Manobra agendada com sucesso!');
+    showNotification('✅ Manobra agendada com sucesso!', 'success');
     this.reset();
     
     // Atualiza lista
@@ -33,15 +34,17 @@ document.getElementById('form-manobra').addEventListener('submit', function(e) {
 function carregarManobras() {
     const tbody = document.getElementById('lista-manobras');
     
-    // Ordena por horário mais próximo
-    const manobrasOrdenadas = manobras.sort((a, b) => a.horario_timestamp - b.horario_timestamp);
+    // Filtra apenas manobras não concluídas e ordena
+    const manobrasAtivas = manobras
+        .filter(m => m.status !== 'concluido')
+        .sort((a, b) => a.horario_timestamp - b.horario_timestamp);
     
-    if (manobrasOrdenadas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Nenhuma manobra agendada</td></tr>';
+    if (manobrasAtivas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Nenhuma manobra ativa</td></tr>';
         return;
     }
     
-    tbody.innerHTML = manobrasOrdenadas.map(manobra => `
+    tbody.innerHTML = manobrasAtivas.map(manobra => `
         <tr>
             <td><strong>${manobra.placa_veiculo}</strong></td>
             <td>${manobra.motorista}</td>
@@ -103,5 +106,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configura o datetime-local para o horário atual + 1 hora
     const agora = new Date();
     agora.setHours(agora.getHours() + 1);
-    document.getElementById('manobra-horario').value = agora.toISOString().slice(0, 16);
+    
+    const manobraHorarioInput = document.getElementById('manobra-horario');
+    if (manobraHorarioInput) {
+        try {
+            manobraHorarioInput.value = agora.toISOString().slice(0, 16);
+        } catch (e) {
+            // Fallback para caso o input não esteja visível
+            console.log('Input de horário de manobra não encontrado na inicialização');
+        }
+    }
 });

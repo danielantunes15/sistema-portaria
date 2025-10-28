@@ -1,21 +1,8 @@
 // Animações e efeitos visuais
 class UIManager {
     static showNotification(message, type = 'success') {
-        // Remove notificações existentes
-        const existingNotifications = document.querySelectorAll('.notification');
-        existingNotifications.forEach(notif => notif.remove());
-
-        // Cria nova notificação
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        // Remove após 5 segundos
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
+       // Delega para a função global em app.js
+       showNotification(message, type);
     }
 
     static startLoading(button) {
@@ -30,46 +17,75 @@ class UIManager {
     }
 
     static formatCPF(cpf) {
+        if (!cpf) return '';
         return cpf.replace(/\D/g, '')
                  .replace(/(\d{3})(\d)/, '$1.$2')
                  .replace(/(\d{3})(\d)/, '$1.$2')
-                 .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                 .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+                 .substring(0, 14);
     }
 
     static formatPlaca(placa) {
-        return placa.toUpperCase().replace(/[^A-Z0-9]/g, '')
-                   .replace(/([A-Z0-9]{3})([A-Z0-9])/, '$1-$2')
-                   .substring(0, 7);
+        if (!placa) return '';
+        // Converte para maiúsculas e remove caracteres não-alfanuméricos
+        let valor = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        
+        // Formato Mercosul (ABC1D23)
+        if (/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(valor)) {
+            // Não precisa de hífen, mas mantemos o padrão
+            return valor;
+        }
+        
+        // Formato Antigo (ABC1234)
+        if (/^[A-Z]{3}[0-9]{4}$/.test(valor)) {
+             return valor.replace(/([A-Z]{3})([0-9]{4})/, '$1-$2');
+        }
+        
+        // Retorna o valor parcialmente formatado durante a digitação
+        return valor.substring(0, 7);
     }
 }
 
 // Efeitos de digitação para campos de formulário
 document.addEventListener('DOMContentLoaded', function() {
     // Formatação automática de CPF
-    const cpfInput = document.getElementById('cpf');
-    if (cpfInput) {
-        cpfInput.addEventListener('input', function(e) {
+    const cpfInputs = document.querySelectorAll('input[name*="cpf"], input[id*="cpf"]');
+    cpfInputs.forEach(input => {
+        input.addEventListener('input', function(e) {
             e.target.value = UIManager.formatCPF(e.target.value);
         });
-    }
+    });
+
 
     // Formatação automática de placa
-    const placaInput = document.getElementById('placa_veiculo');
-    if (placaInput) {
-        placaInput.addEventListener('input', function(e) {
+    const placaInputs = document.querySelectorAll('input[name*="placa"], input[id*="placa"]');
+    placaInputs.forEach(input => {
+         input.addEventListener('input', function(e) {
+            // Formatação em tempo real é complexa; vamos apenas limitar
+            let value = e.target.value.toUpperCase();
+            if (value.length > 8) {
+                 e.target.value = value.substring(0, 8);
+            }
+        });
+        // Formata ao perder o foco
+        input.addEventListener('blur', function(e) {
             e.target.value = UIManager.formatPlaca(e.target.value);
         });
-    }
+    });
 
     // Efeito de foco nos formulários
     const inputs = document.querySelectorAll('input, select, textarea');
     inputs.forEach(input => {
         input.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
+            if (this.parentElement.classList.contains('form-group')) {
+                this.parentElement.classList.add('focused');
+            }
         });
         
         input.addEventListener('blur', function() {
-            this.parentElement.classList.remove('focused');
+            if (this.parentElement.classList.contains('form-group')) {
+                this.parentElement.classList.remove('focused');
+            }
         });
     });
 });

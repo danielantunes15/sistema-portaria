@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Cabeçalho Corporativo -->
     <header class="header">
         <div class="container">
             <nav class="nav">
@@ -17,18 +16,28 @@
                 </div>
                 <ul class="nav-links">
                     <li>
-                        <a href="#" onclick="showPage('dashboard')" class="nav-link active">
+                        <a href="#" onclick="showPage('dashboard', event)" class="nav-link active">
                             <span class="icon">📊</span> Dashboard
                         </a>
                     </li>
                     <li>
-                        <a href="#" onclick="showPage('registro')" class="nav-link">
+                        <a href="#" onclick="showPage('registro', event)" class="nav-link">
                             <span class="icon">🚪</span> Controle de Acesso
                         </a>
                     </li>
                     <li>
-                        <a href="#" onclick="showPage('manobras')" class="nav-link">
+                        <a href="#" onclick="showPage('manobras', event)" class="nav-link">
                             <span class="icon">🚛</span> Gestão de Manobras
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showPage('agendamentos', event)" class="nav-link">
+                            <span class="icon">🗓️</span> Agendamentos
+                        </a>
+                    </li>
+                     <li>
+                        <a href="#" onclick="showPage('consultas', event)" class="nav-link">
+                            <span class="icon">🔍</span> Consultas
                         </a>
                     </li>
                 </ul>
@@ -36,16 +45,13 @@
         </div>
     </header>
 
-    <!-- Conteúdo Principal -->
     <main class="container">
-        <!-- Página Dashboard -->
         <div id="dashboard-page" class="page active">
             <div class="card" style="margin-bottom: 2rem;">
                 <h1>Dashboard - Controle de Acesso</h1>
                 <p style="color: var(--text-light); margin-top: 0.5rem;">Visão geral das operações em tempo real</p>
             </div>
             
-            <!-- Informações dos Turnos -->
             <div class="turno-info">
                 <div class="turno-card" id="turno-a">
                     <h3>Turno A</h3>
@@ -64,24 +70,23 @@
                 </div>
             </div>
 
-            <!-- Estatísticas -->
             <div class="stats-grid">
                 <div class="card">
                     <h3>📈 Métricas do Dia</h3>
                     <div class="stat-item">
-                        <strong>Entradas Registradas:</strong>
+                        <strong>Entradas Registradas (Hoje):</strong>
                         <span id="total-entradas">0</span>
                     </div>
                     <div class="stat-item">
-                        <strong>Total de Pessoas:</strong>
-                        <span id="total-pessoas">0</span>
+                        <strong>Pessoas no Pátio (Agora):</strong>
+                        <span id="total-pessoas-agora">0</span>
                     </div>
                     <div class="stat-item">
-                        <strong>Ônibus em Pátio:</strong>
-                        <span id="onibus-ativos">0</span>
+                        <strong>Veículos no Pátio (Agora):</strong>
+                        <span id="veiculos-no-patio">0</span>
                     </div>
                     <div class="stat-item">
-                        <strong>Operações Agendadas:</strong>
+                        <strong>Operações de Manobra (Hoje):</strong>
                         <span id="manobras-hoje">0</span>
                     </div>
                 </div>
@@ -89,54 +94,69 @@
                 <div class="card">
                     <h3>⚡ Centro de Controle</h3>
                     <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <button class="btn btn-primary" onclick="showPage('registro')">
+                        <button class="btn btn-primary" onclick="showPage('registro', event)">
                             <span class="icon">📝</span> Novo Registro
                         </button>
-                        <button class="btn btn-secondary" onclick="showPage('manobras')">
-                            <span class="icon">🗓️</span> Agendar Operação
+                        <button class="btn btn-secondary" onclick="showPage('agendamentos', event)">
+                            <span class="icon">🗓️</span> Novo Agendamento
                         </button>
-                        <button class="btn btn-secondary" onclick="gerarRelatorio()">
-                            <span class="icon">📊</span> Relatório Executivo
+                        <button class="btn btn-secondary" onclick="showPage('consultas', event)">
+                            <span class="icon">🔍</span> Consultar Registros
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Últimos Registros -->
-            <div class="card">
-                <h3>🕒 Últimas Movimentações</h3>
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Horário</th>
-                                <th>Veículo</th>
-                                <th>Placa</th>
-                                <th>Pessoas</th>
-                                <th>Tipo</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ultimos-registros">
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-light);">
-                                    Nenhum registro hoje
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="stats-grid">
+                <div class="card">
+                    <h3>🕒 Veículos Atualmente no Pátio</h3>
+                    <div class="table-container" style="max-height: 300px;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Placa</th>
+                                    <th>Empresa</th>
+                                    <th>Pessoas</th>
+                                    <th>Entrada</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-veiculos-no-patio">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Fluxo de Entradas (Hoje)</h3>
+                    <div class="chart-container" id="fluxo-chart">
+                        </div>
                 </div>
             </div>
         </div>
 
-        <!-- Página Registro de Acesso -->
         <div id="registro-page" class="page">
             <div class="card" style="margin-bottom: 2rem;">
                 <h1>🚪 Controle de Acesso</h1>
                 <p style="color: var(--text-light); margin-top: 0.5rem;">Registro de entrada e saída de veículos e pessoas</p>
             </div>
             
+            <div class="card">
+                <h3>🔍 Buscar Agendamento / Registrar Saída</h3>
+                <div class="form-grid" style="align-items: flex-end;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="busca-placa-agendamento">Buscar Placa (Agendamento ou Saída)</label>
+                        <input type="text" id="busca-placa-agendamento" placeholder="ABC-1D23" style="font-size: 1.2rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <button class="btn btn-primary" id="btn-buscar-placa">
+                            <span class="icon">🔍</span> Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <form id="form-registro" class="card">
-                <h3>📋 Novo Registro</h3>
+                <h3 id="form-registro-titulo">📋 Novo Registro de Entrada</h3>
                 
                 <div class="form-grid">
                     <div class="form-group">
@@ -180,7 +200,7 @@
 
                     <div class="form-group full-width">
                         <label for="empresa">Empresa/Contratante:</label>
-                        <input type="text" id="empresa" name="empresa" placeholder="Nome da empresa ou organização">
+                        <input type="text" id="empresa" name="empresa" placeholder="Nome da empresa ou organização" list="empresas-list">
                     </div>
 
                     <div class="form-group full-width">
@@ -193,40 +213,13 @@
                     <button type="submit" class="btn btn-primary">
                         <span class="icon">💾</span> Salvar Registro
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="showPage('dashboard')">
+                    <button type="button" class="btn btn-secondary" onclick="showPage('dashboard', event)">
                         <span class="icon">↩️</span> Voltar ao Dashboard
                     </button>
                 </div>
             </form>
-
-            <!-- Registros Recentes -->
-            <div class="card">
-                <h3>📝 Registros Recentes</h3>
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Data/Hora</th>
-                                <th>Veículo</th>
-                                <th>Placa</th>
-                                <th>Pessoas</th>
-                                <th>Tipo</th>
-                                <th>Responsável</th>
-                            </tr>
-                        </thead>
-                        <tbody id="registros-recentes">
-                            <tr>
-                                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-light);">
-                                    Nenhum registro encontrado
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
 
-        <!-- Página Manobras -->
         <div id="manobras-page" class="page">
             <div class="card" style="margin-bottom: 2rem;">
                 <h1>🚛 Gestão de Manobras</h1>
@@ -274,9 +267,6 @@
                             <button type="submit" class="btn btn-primary">
                                 <span class="icon">✅</span> Agendar Operação
                             </button>
-                            <button type="button" class="btn btn-secondary" onclick="showPage('dashboard')">
-                                <span class="icon">↩️</span> Voltar
-                            </button>
                         </div>
                     </form>
                 </div>
@@ -296,24 +286,147 @@
                                 </tr>
                             </thead>
                             <tbody id="lista-manobras">
-                                <tr>
-                                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-light);">
-                                        Nenhuma operação agendada
-                                    </td>
-                                </tr>
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div id="agendamentos-page" class="page">
+            <div class="card" style="margin-bottom: 2rem;">
+                <h1>🗓️ Agendamentos</h1>
+                <p style="color: var(--text-light); margin-top: 0.5rem;">Pré-cadastro de visitantes e prestadores de serviço</p>
+            </div>
+            
+            <div class="manobras-grid">
+                <div class="card">
+                    <h3>📅 Novo Agendamento</h3>
+                    <form id="form-agendamento">
+                        <div class="form-group">
+                            <label for="ag-placa">Placa do Veículo:</label>
+                            <input type="text" id="ag-placa" name="placa_veiculo" placeholder="ABC-1D23" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ag-nome">Nome do Responsável:</label>
+                            <input type="text" id="ag-nome" name="nome" placeholder="Nome completo" required>
+                        </div>
+                         <div class="form-group">
+                            <label for="ag-cpf">CPF do Responsável:</label>
+                            <input type="text" id="ag-cpf" name="cpf" placeholder="000.000.000-00">
+                        </div>
+                        <div class="form-group">
+                            <label for="ag-empresa">Empresa/Contratante:</label>
+                            <input type="text" id="ag-empresa" name="empresa" placeholder="Nome da empresa">
+                        </div>
+                        <div class="form-group">
+                            <label for="ag-horario">Horário Previsto:</label>
+                            <input type="datetime-local" id="ag-horario" name="horario_previsto" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ag-observacoes">Observações:</label>
+                            <textarea id="ag-observacoes" name="observacoes" rows="3" placeholder="Motivo da visita..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="icon">✅</span> Salvar Agendamento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>📋 Agendamentos Futuros</h3>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Placa</th>
+                                    <th>Responsável</th>
+                                    <th>Empresa</th>
+                                    <th>Horário Previsto</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-agendamentos">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="consultas-page" class="page">
+            <div class="card" style="margin-bottom: 2rem;">
+                <h1>🔍 Consultas e Relatórios</h1>
+                <p style="color: var(--text-light); margin-top: 0.5rem;">Filtre e exporte o histórico de movimentações</p>
+            </div>
+            
+            <div class="card">
+                <h3>Filtrar Registros</h3>
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr; align-items: flex-end;">
+                    <div class="form-group">
+                        <label for="filtro-data-inicio">Data Início:</label>
+                        <input type="date" id="filtro-data-inicio" name="filtro-data-inicio">
+                    </div>
+                    <div class="form-group">
+                        <label for="filtro-data-fim">Data Fim:</label>
+                        <input type="date" id="filtro-data-fim" name="filtro-data-fim">
+                    </div>
+                    <div class="form-group">
+                        <label for="filtro-placa">Placa:</label>
+                        <input type="text" id="filtro-placa" name="filtro-placa" placeholder="ABC-1D23">
+                    </div>
+                    <div class="form-group">
+                        <label for="filtro-empresa">Empresa:</label>
+                        <input type="text" id="filtro-empresa" name="filtro-empresa" placeholder="Nome da empresa">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" id="btn-filtrar">
+                        <span class="icon">🔍</span> Filtrar
+                    </button>
+                    <button class="btn btn-secondary" id="btn-exportar-csv">
+                        <span class="icon">📊</span> Exportar para CSV
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Resultados da Consulta</h3>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Placa</th>
+                                <th>Responsável</th>
+                                <th>Empresa</th>
+                                <th>Pessoas</th>
+                                <th>Entrada</th>
+                                <th>Saída</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-consultas">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-light);">
+                                    Use os filtros acima para buscar
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </main>
 
-    <!-- Scripts -->
+    <datalist id="empresas-list"></datalist>
+
     <script src="js/app.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/registro.js"></script>
     <script src="js/manobras.js"></script>
     <script src="js/animations.js"></script>
-</body>
+    <script src="js/agendamentos.js"></script> <script src="js/consultas.js"></script> </body>
 </html>
