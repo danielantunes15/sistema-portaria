@@ -13,13 +13,14 @@ const qtdPessoasInput = document.getElementById('quantidade_pessoas');
 const nomeInput = document.getElementById('nome');
 const cpfInput = document.getElementById('cpf');
 const empresaInput = document.getElementById('empresa');
+const setorInput = document.getElementById('setor_destino'); // NOVO
 const obsInput = document.getElementById('observacoes');
 
 // Botão de submit
 const submitButton = formRegistro.querySelector('button[type="submit"]');
 
 // ==========================
-// LÓGICA DE BUSCA (SAÍDA E AGENDAMENTO)
+// LÓGICA DE BUSCA
 // ==========================
 
 btnBuscarPlaca.addEventListener('click', function() {
@@ -33,27 +34,38 @@ btnBuscarPlaca.addEventListener('click', function() {
     const veiculoNoPatio = registros.find(r => 
         r.placa_veiculo === placa && r.status === 'dentro'
     );
-
     if (veiculoNoPatio) {
         preencherFormularioParaSaida(veiculoNoPatio);
         showNotification('Veículo encontrado. Pronto para registrar SAÍDA.', 'success');
-    } else {
-        // 2. Se não está no pátio, buscar AGENDAMENTO
-        const agendamento = agendamentos.find(a => 
-            a.placa_veiculo === placa && a.status === 'agendado'
-        );
-        
-        if (agendamento) {
-            preencherFormularioComAgendamento(agendamento);
-            showNotification('Agendamento encontrado. Pronto para registrar ENTRADA.', 'success');
-        } else {
-            // 3. Se não achou em nenhum, apenas preenche a placa para ENTRADA
-            resetarFormulario();
-            placaInput.value = placa;
-            tipoEntradaInput.value = 'entrada';
-            showNotification('Placa não encontrada. Preencha para nova ENTRADA.', 'warning');
-        }
+        buscaPlacaInput.value = '';
+        return;
+    } 
+    
+    // 2. Se não está no pátio, buscar na FROTA PRÓPRIA
+    const veiculoFrota = frota.find(f => f.placa === placa);
+    if (veiculoFrota) {
+        preencherFormularioComFrota(veiculoFrota);
+        showNotification('Veículo da Frota Própria encontrado.', 'success');
+        buscaPlacaInput.value = '';
+        return;
     }
+
+    // 3. Se não é da frota, buscar AGENDAMENTO
+    const agendamento = agendamentos.find(a => 
+        a.placa_veiculo === placa && a.status === 'agendado'
+    );
+    if (agendamento) {
+        preencherFormularioComAgendamento(agendamento);
+        showNotification('Agendamento encontrado. Pronto para registrar ENTRADA.', 'success');
+        buscaPlacaInput.value = '';
+        return;
+    }
+    
+    // 4. Se não achou em nenhum, apenas preenche a placa para ENTRADA
+    resetarFormulario();
+    placaInput.value = placa;
+    tipoEntradaInput.value = 'entrada';
+    showNotification('Placa não encontrada. Preencha para nova ENTRADA.', 'warning');
     buscaPlacaInput.value = '';
 });
 
@@ -69,6 +81,7 @@ function preencherFormularioParaSaida(registro) {
     empresaInput.value = registro.empresa;
     tipoVeiculoInput.value = registro.tipo_veiculo;
     qtdPessoasInput.value = registro.quantidade_pessoas;
+    setorInput.value = registro.setor_destino || ''; // Carrega o setor
     obsInput.value = registro.observacoes;
 
     // Desabilita campos que não podem ser alterados na saída
@@ -78,7 +91,30 @@ function preencherFormularioParaSaida(registro) {
     empresaInput.disabled = true;
     tipoVeiculoInput.disabled = true;
     qtdPessoasInput.disabled = true;
+    setorInput.disabled = true;
 }
+
+function preencherFormularioComFrota(veiculo) {
+    resetarFormulario();
+    formTitulo.textContent = '📋 Registrar Entrada (Frota Própria)';
+    submitButton.innerHTML = '<span class="icon">🟢</span> Confirmar Entrada';
+
+    tipoEntradaInput.value = 'entrada';
+    placaInput.value = veiculo.placa;
+    nomeInput.value = veiculo.responsavel; // Puxa o responsável
+    empresaInput.value = 'Frota Própria'; // Padrão
+    tipoVeiculoInput.value = veiculo.tipo; // Puxa o tipo
+    obsInput.value = veiculo.descricao; // Puxa a descrição
+    
+    // Desabilita campos da frota
+    placaInput.disabled = true;
+    empresaInput.disabled = true;
+    
+    // Foca no campo de pessoas
+    qtdPessoasInput.value = 1;
+    qtdPessoasInput.focus();
+}
+
 
 function preencherFormularioComAgendamento(agendamento) {
     resetarFormulario();
@@ -91,9 +127,6 @@ function preencherFormularioComAgendamento(agendamento) {
     cpfInput.value = agendamento.cpf;
     empresaInput.value = agendamento.empresa;
     obsInput.value = agendamento.observacoes;
-    
-    // Sugere o tipo de veículo (se tivermos essa info no futuro)
-    // tipoVeiculoInput.value = agendamento.tipo_veiculo || 'carro';
     
     // Foca no campo de pessoas
     qtdPessoasInput.value = 1;
@@ -134,7 +167,7 @@ formRegistro.addEventListener('submit', async function(e) {
 
 async function registrarEntrada() {
     const formData = new FormData(formRegistro);
-    const placa = UIManager.formatPlaca(formData.get('placa_veiculo'));
+    const placa = UIManager.formatPlaca(placaInput.disabled ? placaInput.value : formData.get('placa_veiculo'));
 
     // Validação 1: Placa válida?
     if (!validarPlaca(placa)) {
@@ -154,6 +187,11 @@ async function registrarEntrada() {
     if (cpf && cpf.length > 0 && !validarCPF(cpf)) {
          throw new Error('CPF inválido');
     }
+
+    // Validação 4: Setor de destino
+    if (!formData.get('setor_destino')) {
+        throw new Error('Setor de destino é obrigatório');
+    }
     
     const agora = new Date();
     const novoRegistro = {
@@ -165,13 +203,14 @@ async function registrarEntrada() {
         nome: formData.get('nome'),
         cpf: cpf,
         empresa: formData.get('empresa'),
+        setor_destino: formData.get('setor_destino'), // NOVO CAMPO
         observacoes: formData.get('observacoes'),
         
         data_hora_entrada: agora.toLocaleString('pt-BR'),
         timestamp_entrada: agora.getTime(),
         
-        data_hora_saida: null, // Novo campo
-        timestamp_saida: null  // Novo campo
+        data_hora_saida: null,
+        timestamp_saida: null
     };
 
     // Adiciona o novo registro
@@ -194,7 +233,6 @@ async function registrarEntrada() {
 
     // Volta para o dashboard após 1.5 segundos
     setTimeout(() => {
-        // Clica no link do dashboard
         document.querySelector('.nav-link[onclick*="dashboard"]').click();
     }, 1500);
 }
@@ -222,7 +260,6 @@ async function registrarSaida() {
 
     // Volta para o dashboard após 1.5 segundos
     setTimeout(() => {
-        // Clica no link do dashboard
         document.querySelector('.nav-link[onclick*="dashboard"]').click();
     }, 1500);
 }
@@ -230,6 +267,24 @@ async function registrarSaida() {
 // ==========================
 // FUNÇÕES AUXILIARES
 // ==========================
+
+// NOVO: Carrega os setores cadastrados no <select>
+function carregarOpcoesSetores() {
+    if (!setorInput) return;
+    
+    // Limpa opções antigas (exceto a primeira "Selecione...")
+    setorInput.innerHTML = '<option value="">Selecione o destino...</option>';
+    
+    setores.sort((a, b) => a.nome.localeCompare(b.nome)); // Ordena alfabeticamente
+    
+    setores.forEach(setor => {
+        const option = document.createElement('option');
+        option.value = setor.nome;
+        option.textContent = setor.nome;
+        setorInput.appendChild(option);
+    });
+}
+
 
 function resetarFormulario() {
     formRegistro.reset();
@@ -243,6 +298,7 @@ function resetarFormulario() {
     empresaInput.disabled = false;
     tipoVeiculoInput.disabled = false;
     qtdPessoasInput.disabled = false;
+    setorInput.disabled = false;
     
     // Remove o ID do agendamento
     delete formRegistro.dataset.agendamentoId;
@@ -250,14 +306,12 @@ function resetarFormulario() {
 
 function validarPlaca(placa) {
     const placaLimpa = placa.replace(/[^A-Z0-9]/g, '');
-    // Regex simples (aceita Mercosul e antiga)
     const placaRegex = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
     return placaRegex.test(placaLimpa);
 }
 
 function validarCPF(cpf) {
     const cpfLimpo = cpf.replace(/\D/g, '');
-    // Apenas validação de tamanho, não de dígitos verificadores
     return cpfLimpo.length === 11;
 }
 
@@ -269,6 +323,3 @@ tipoVeiculoInput.addEventListener('change', function(e) {
     };
     qtdPessoasInput.value = valoresPadrao[e.target.value] || 1;
 });
-
-// Carrega o datalist ao iniciar
-document.addEventListener('DOMContentLoaded', atualizarDatalistEmpresas);

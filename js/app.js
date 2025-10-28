@@ -2,6 +2,9 @@
 let registros = JSON.parse(localStorage.getItem('registros_portaria')) || [];
 let manobras = JSON.parse(localStorage.getItem('manobras_portaria')) || [];
 let agendamentos = JSON.parse(localStorage.getItem('agendamentos_portaria')) || [];
+let frota = JSON.parse(localStorage.getItem('frota_portaria')) || [];
+let setores = JSON.parse(localStorage.getItem('setores_portaria')) || [];
+let empresas = JSON.parse(localStorage.getItem('empresas_portaria')) || [];
 
 // Controle de navegação entre páginas
 function showPage(pageId, event) {
@@ -37,13 +40,15 @@ function showPage(pageId, event) {
     } else if (pageId === 'manobras') {
         carregarManobras();
     } else if (pageId === 'registro') {
-        // Carrega sugestões de auto-complete
+        // Carrega sugestões de auto-complete e setores
         atualizarDatalistEmpresas();
-        // Pode carregar registros recentes se necessário, embora essa tabela tenha sido removida da UI
+        carregarOpcoesSetores(); // Função de registro.js
     } else if (pageId === 'agendamentos') {
         carregarAgendamentos(); // Função de agendamentos.js
     } else if (pageId === 'consultas') {
         // A página de consultas é reativa aos filtros
+    } else if (pageId === 'admin') {
+        carregarAdmin(); // Função de admin.js
     }
 }
 
@@ -83,12 +88,14 @@ function salvarDados() {
     localStorage.setItem('registros_portaria', JSON.stringify(registros));
     localStorage.setItem('manobras_portaria', JSON.stringify(manobras));
     localStorage.setItem('agendamentos_portaria', JSON.stringify(agendamentos));
+    localStorage.setItem('frota_portaria', JSON.stringify(frota));
+    localStorage.setItem('setores_portaria', JSON.stringify(setores));
+    localStorage.setItem('empresas_portaria', JSON.stringify(empresas));
 }
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     // Define o dashboard como página inicial e ativa o link
-    document.querySelector('.nav-link.active').classList.remove('active');
     document.querySelector('.nav-link[onclick*="dashboard"]').classList.add('active');
     document.getElementById('dashboard-page').classList.add('active');
     
@@ -147,7 +154,9 @@ function atualizarDatalistEmpresas() {
     // Pega empresas dos registros E dos agendamentos
     const empresasRegistros = [...new Set(registros.map(r => r.empresa).filter(Boolean))];
     const empresasAgendamentos = [...new Set(agendamentos.map(a => a.empresa).filter(Boolean))];
-    const empresasUnicas = [...new Set([...empresasRegistros, ...empresasAgendamentos])];
+    const empresasCadastradas = [...new Set(empresas.map(e => e.nome).filter(Boolean))];
+
+    const empresasUnicas = [...new Set([...empresasRegistros, ...empresasAgendamentos, ...empresasCadastradas, 'Frota Própria'])];
 
     datalist.innerHTML = empresasUnicas.map(empresa => 
         `<option value="${empresa}">`
